@@ -18,8 +18,7 @@ export class WordExample extends PrimaryEntity {
 
   @ManyToOne(() => WordDetail, (word_detail_ids) => word_detail_ids.word_example_ids, {
     onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-    eager: true,
+    onUpdate: "CASCADE"
   })
   detail_id: WordDetail;
 

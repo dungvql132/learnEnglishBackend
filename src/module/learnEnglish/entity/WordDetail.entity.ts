@@ -9,7 +9,7 @@ import {
   OneToMany,
   JoinColumn,
 } from "typeorm";
-import { User } from "@src/authentication/entity/User.entity";
+import { User } from "@src/module/authentication/entity/User.entity";
 import { Word } from "./Word.entity";
 import { WordType } from "./WordType.entity";
 import { WordExample } from "./Word.example.entity";
@@ -32,7 +32,6 @@ export class WordDetail extends PrimaryEntity {
   meaning: string;
 
   @ManyToOne(() => Word, (word) => word.word_detail_ids, {
-    eager: true,
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
@@ -50,6 +49,8 @@ export class WordDetail extends PrimaryEntity {
   @OneToMany(() => WordExample, (word_example_ids) => word_example_ids.detail_id, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
+    cascade: true,
+    eager: true,
   })
   word_example_ids: WordDetail[];
 

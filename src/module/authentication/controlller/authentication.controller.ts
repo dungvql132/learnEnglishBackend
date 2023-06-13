@@ -1,29 +1,38 @@
 import express, { type Application, type Request, type Response, type NextFunction } from "express";
-import { User, IUser } from "@src/authentication/entity/User.entity";
+import { User, IUser } from "@src/module/authentication/entity/User.entity";
 import { dataSource } from "@src/database/connection";
-import { errorHandler } from "@src/authentication/middlewere/errorHandle";
+import { errorHandler } from "@src/module/authentication/middlewere/errorHandle";
 
 import * as dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { type IPayload } from "@src/common/base/interface/payload";
 import { SuccessResponse, ErrorResponse } from "@src/common/base/interface";
-import { successes, errors } from "@src/authentication/message";
+import { successes, errors } from "@src/module/authentication/message";
 import bcrypt from "bcryptjs";
 
 dotenv.config();
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: IPayload;
+    }
+  }
+}
+
 const appAuthen: Application = express();
 
-async function login_controller(req: Request, res: Response, next: NextFunction) {
+async function loginController(req: Request, res: Response, next: NextFunction) {
   const repository = dataSource.getRepository(User);
 
-  const { email, password, firstName, lastName } = req.body.data;
+  const { email, password, firstName, lastName, id } = req.body.data;
   let token = "";
   const checkUser = await repository.findOneBy({
     email,
   });
 
   const payload: IPayload = {
+    id,
     email,
     name: firstName + lastName,
   };
@@ -45,7 +54,7 @@ async function login_controller(req: Request, res: Response, next: NextFunction)
   next(error);
 }
 
-async function register_login(req: Request, res: Response, next: NextFunction) {
+async function registerController(req: Request, res: Response, next: NextFunction) {
   const repository = dataSource.getRepository(User);
   const { email, password } = req.body.data;
 
@@ -61,19 +70,33 @@ async function register_login(req: Request, res: Response, next: NextFunction) {
   user.setData(req.body.data);
   user.password = bcrypt.hashSync(password, 10);
 
+  const rs = await repository.save(user);
   const payload: IPayload = {
+    id: rs.id,
     email,
     name: user.firstName + user.lastName,
   };
   const token = jwt.sign(payload, process.env.JWTSecret!);
-  const rs = repository.save(user);
   if (!rs) {
     next(new Error(errors.CANNOt_CREATE_USER));
     return;
   }
 
   // NODE_ENV
-  res.status(200).json(new SuccessResponse(200, successes.CREATE_USER_SUCCESS, token));
+  return res.status(200).json(new SuccessResponse(200, successes.CREATE_USER_SUCCESS, token));
 }
 
-export { register_login, login_controller };
+async function getCurrentUser(req: Request, res: Response, next: NextFunction) {
+  const repository = dataSource.getRepository(User);
+  if (req.user) {
+    const { email } = req.user;
+
+    const checkUser = await repository.findOneBy({
+      email,
+    });
+    return res.status(200).json(new SuccessResponse(200, successes.CREATE_USER_SUCCESS, "", checkUser));
+  }
+  next(new Error("Cannot find user"));
+}
+
+export { registerController, loginController, getCurrentUser };

@@ -3,13 +3,21 @@ import express, { type Application } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { dataSource } from "@src/database/connection";
-import authentication from "@src/authentication";
-import learnEnglish from "@src/learnEnglish";
+import authenticationApp from "@src/module/authentication/router";
+import learnEnglishApp from "@src/module/learnEnglish/router";
+import uploadfileApp from "@src/module/uploadFile/router";
+import { SocketIOServer } from "@src/module/websocket";
+import { createServer } from "http";
+import { requiredTokenMiddleware } from "@src/module/authentication/middlewere/validate";
+
+import dotenv from "dotenv";
+dotenv.config();
 
 const app: Application = express();
-const port = 5000;
+const port = process.env.PORT || 1302;
+const httpServer = createServer(app);
 
-// Where we will keep books
+const ioServer = new SocketIOServer(httpServer);
 
 app.use(cors());
 
@@ -18,10 +26,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // authentication
-app.use("/authentication/", authentication);
-app.use("/learnEnglish/", learnEnglish);
+app.use("/routes", requiredTokenMiddleware);
 
-app.listen(port, async () => {
+app.use("/authentication/", authenticationApp);
+app.use("/routes/learnEnglish/", learnEnglishApp);
+app.use("/routes/upload/", uploadfileApp);
+
+httpServer.listen(port, async () => {
   // await connection
   console.log(`listening on port ${port}!`);
 });

@@ -13,13 +13,14 @@ class ControllerFactory {
   find_controller() {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const repositoryWord = dataSource.getRepository(this.tableEntity);
-        const result = await repositoryWord.find();
+        const repository = dataSource.getRepository(this.tableEntity);
+        const result = await repository.find();
+
         if (result) {
           return res.status(200).json(new SuccessResponse(200, "find success", undefined, result));
         }
       } catch (error) {
-        return res.status(500).json("Lỗi server");
+        next(new Error("Cannot find"));
       }
     };
   }
@@ -61,7 +62,7 @@ class ControllerFactory {
 
         const result = await repository.update(option, newData);
 
-        res.status(200).json(new SuccessResponse(200, "update success", undefined, result));
+        return res.status(200).json(new SuccessResponse(200, "update success", undefined, result));
       } catch (error) {
         next(error);
       }
@@ -77,7 +78,7 @@ class ControllerFactory {
 
         const result = await repository.delete(option);
 
-        res.status(200).json(new SuccessResponse(200, "delete success", undefined, result));
+        return res.status(200).json(new SuccessResponse(200, "delete success", undefined, result));
       } catch (error) {
         next(error);
       }

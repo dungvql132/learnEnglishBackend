@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, ManyToMany, JoinTable, OneToMany } from "typeorm";
-import { User } from "@src/authentication/entity/User.entity";
+import { User } from "@src/module/authentication/entity/User.entity";
 import { WordDetail } from "./WordDetail.entity";
 import { PrimaryEntity } from "@src/common/base/entity";
 
@@ -26,6 +26,7 @@ export class Word extends PrimaryEntity {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
     cascade: true,
+    eager: true,
   })
   word_detail_ids: WordDetail[];
 

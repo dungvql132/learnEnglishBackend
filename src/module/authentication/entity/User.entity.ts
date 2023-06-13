@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, ManyToMany, JoinTable } from "typeorm";
-import { Word } from "@src/learnEnglish/entity/Word.entity";
+import { Word } from "@src/module/learnEnglish/entity/Word.entity";
 import { PrimaryEntity } from "@src/common/base/entity";
+import { UserUpload } from "@src/module/uploadFile/entity/UserUpload.entity";
 
 export interface IUser {
   id?: number;
@@ -41,6 +42,14 @@ export class User extends PrimaryEntity {
   view_word_ids: Word[];
 
   // ================================================
+  // upLoad
+  @OneToMany(() => UserUpload, (user_upload_ids) => user_upload_ids.user_id, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    cascade: true,
+    eager: true,
+  })
+  user_upload_ids: UserUpload[];
 
   setData(data?: IUser) {
     if (data != null) {

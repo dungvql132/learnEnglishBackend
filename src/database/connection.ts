@@ -1,20 +1,25 @@
-import { User } from "@src/authentication/entity/User.entity";
-import { Word } from "@src/learnEnglish/entity/Word.entity";
-import { WordExample } from "@src/learnEnglish/entity/Word.example.entity";
-import { WordDetail } from "@src/learnEnglish/entity/WordDetail.entity";
-import { WordType } from "@src/learnEnglish/entity/WordType.entity";
+// connect to POSTSQL
+
+import { User } from "@src/module/authentication/entity/User.entity";
+import { Word } from "@src/module/learnEnglish/entity/Word.entity";
+import { WordExample } from "@src/module/learnEnglish/entity/Word.example.entity";
+import { WordDetail } from "@src/module/learnEnglish/entity/WordDetail.entity";
+import { WordType } from "@src/module/learnEnglish/entity/WordType.entity";
+import { UserUpload } from "@src/module/uploadFile/entity/UserUpload.entity";
 import { DataSource } from "typeorm";
+import dotenv from "dotenv";
+dotenv.config();
 
 import { createConnection } from "typeorm";
 
 export const dataSource = new DataSource({
   type: "postgres",
-  host: "localhost",
-  port: 5432,
-  username: "dung",
-  password: "1",
-  database: "project",
-  entities: [User, Word, WordDetail, WordType, WordExample],
+  host: process.env.POSTGRES_HOST,
+  port: Number(process.env.POSTGRES_PORT),
+  username: process.env.POSTGRES_USERNAME,
+  password: `${process.env.POSTGRES_PASSWORD}`,
+  database: process.env.POSTGRES_DATABASE,
+  entities: [User, Word, WordDetail, WordType, WordExample, UserUpload],
   logging: false,
   synchronize: true,
   name: "default",
@@ -22,27 +27,39 @@ export const dataSource = new DataSource({
 dataSource
   .connect()
   .then(() => {
-    console.log("Kết nối cơ sở dữ liệu thành công");
+    console.log("Connect to postSQL successfull");
   })
   .catch((error) => {
-    console.log("Lỗi kết nối cơ sở dữ liệu:", error);
+    console.log("Error to connect to postSQL:", error);
   });
 
 export default createConnection({
   type: "postgres",
-  host: "localhost",
-  port: 5432,
-  username: "dung",
-  password: "1",
-  database: "project",
-  entities: [User, Word, WordDetail, WordType, WordExample],
+  host: process.env.POSTGRES_HOST,
+  port: Number(process.env.POSTGRES_PORT),
+  username: process.env.POSTGRES_USERNAME,
+  password: `${process.env.POSTGRES_PASSWORD}`,
+  database: process.env.POSTGRES_DATABASE,
+  entities: [User, Word, WordDetail, WordType, WordExample, UserUpload],
   logging: false,
   synchronize: true,
   name: "default",
 })
   .then(() => {
-    console.log("Kết nối cơ sở dữ liệu thành công");
+    // console.log("Connect to postSQL successfull");
   })
   .catch((error) => {
-    console.log("Lỗi kết nối cơ sở dữ liệu:", error);
+    // console.log("Error to connect to postSQL:", error);
+  });
+
+// connect to MongoDB
+import mongoose from "mongoose";
+// MONGODB_PATH
+mongoose
+  .connect(process.env.MONGODB_PATH!)
+  .then(() => {
+    console.log("Connected to MongoDB!");
+  })
+  .catch((err) => {
+    console.error("Error connecting to MongoDB:", err);
   });
