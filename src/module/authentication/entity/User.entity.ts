@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, ManyToMa
 import { Word } from "@src/module/learnEnglish/entity/Word.entity";
 import { PrimaryEntity } from "@src/common/base/entity";
 import { UserUpload } from "@src/module/uploadFile/entity/UserUpload.entity";
+import { FriendRequest } from "@src/module/userManager/entity/FriendRequest.entity";
 
 export interface IUser {
   id?: number;
@@ -50,6 +51,32 @@ export class User extends PrimaryEntity {
     eager: true,
   })
   user_upload_ids: UserUpload[];
+
+  // ================================================
+  // friends
+  @ManyToMany(() => User, (friend_ids) => friend_ids.id, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    cascade: true,
+  })
+  @JoinTable()
+  friend_ids: Promise<User[]>;
+
+  @OneToMany(() => FriendRequest, (send_friend_request_ids) => send_friend_request_ids.from_user_id, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    cascade: true,
+    eager: true,
+  })
+  send_friend_request_ids: Promise<FriendRequest[]>;
+
+  @OneToMany(() => FriendRequest, (receive_friend_request_ids) => receive_friend_request_ids.to_user_id, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    cascade: true,
+    eager: true,
+  })
+  receive_friend_request_ids: Promise<FriendRequest[]>;
 
   setData(data?: IUser) {
     if (data != null) {

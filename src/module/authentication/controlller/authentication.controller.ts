@@ -1,4 +1,4 @@
-import express, { type Application, type Request, type Response, type NextFunction } from "express";
+import express, { Application, Request, Response, NextFunction } from "express";
 import { User, IUser } from "@src/module/authentication/entity/User.entity";
 import { dataSource } from "@src/database/connection";
 import { errorHandler } from "@src/module/authentication/middlewere/errorHandle";
@@ -12,14 +12,6 @@ import bcrypt from "bcryptjs";
 
 dotenv.config();
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: IPayload;
-    }
-  }
-}
-
 const appAuthen: Application = express();
 
 async function loginController(req: Request, res: Response, next: NextFunction) {
@@ -31,13 +23,13 @@ async function loginController(req: Request, res: Response, next: NextFunction) 
     email,
   });
 
-  const payload: IPayload = {
-    id,
-    email,
-    name: firstName + lastName,
-  };
   if (!(checkUser == null) && process.env.JWTSecret) {
     try {
+      const payload: IPayload = {
+        id: checkUser.id,
+        email,
+        name: firstName + lastName,
+      };
       const isPasswordValid = bcrypt.compareSync(password, checkUser.password);
       if (!isPasswordValid) next(new Error(errors.WRONG_PASSWORD));
 
@@ -94,9 +86,19 @@ async function getCurrentUser(req: Request, res: Response, next: NextFunction) {
     const checkUser = await repository.findOneBy({
       email,
     });
+    await checkUser?.friend_ids;
+
     return res.status(200).json(new SuccessResponse(200, successes.CREATE_USER_SUCCESS, "", checkUser));
   }
   next(new Error("Cannot find user"));
 }
 
-export { registerController, loginController, getCurrentUser };
+async function getAllUser(req: Request, res: Response, next: NextFunction) {
+  const repository = dataSource.getRepository(User);
+  const allUser = await repository.find({
+    relations: ["friend_ids"],
+  });
+  return res.status(200).json(new SuccessResponse(200, successes.CREATE_USER_SUCCESS, "", allUser));
+}
+
+export { registerController, loginController, getCurrentUser, getAllUser };

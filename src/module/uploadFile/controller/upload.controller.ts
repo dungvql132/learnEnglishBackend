@@ -8,14 +8,6 @@ import { UserUpload } from "../entity/UserUpload.entity";
 import { User } from "@src/module/authentication/entity/User.entity";
 dotenv.config();
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: IPayload;
-    }
-  }
-}
-
 async function getSignedUrlUploadFileController(req: Request, res: Response, next: NextFunction) {
   // NODE_ENV
   const { contentType = "" } = req.query || {};
@@ -48,9 +40,9 @@ async function getSignedUrlUploadFileController(req: Request, res: Response, nex
       }
       return res.status(200).json({ url, key });
     });
+  } else {
+    next(new Error("Cannot find user"));
   }
-
-  next(new Error("Cannot find user"));
 }
 
 async function uploadFileSuccess(req: Request, res: Response, next: NextFunction) {
@@ -71,9 +63,9 @@ async function uploadFileSuccess(req: Request, res: Response, next: NextFunction
       const result = await repository.save(userUpload);
       return res.status(200).json({ data: result });
     }
+  } else {
+    next(new Error("Cannot find user"));
   }
-
-  next(new Error("Cannot find user"));
 }
 
 export { getSignedUrlUploadFileController, uploadFileSuccess };

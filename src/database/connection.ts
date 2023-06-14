@@ -6,6 +6,7 @@ import { WordExample } from "@src/module/learnEnglish/entity/Word.example.entity
 import { WordDetail } from "@src/module/learnEnglish/entity/WordDetail.entity";
 import { WordType } from "@src/module/learnEnglish/entity/WordType.entity";
 import { UserUpload } from "@src/module/uploadFile/entity/UserUpload.entity";
+import { FriendRequest } from "@src/module/userManager/entity/FriendRequest.entity";
 import { DataSource } from "typeorm";
 import dotenv from "dotenv";
 dotenv.config();
@@ -19,7 +20,7 @@ export const dataSource = new DataSource({
   username: process.env.POSTGRES_USERNAME,
   password: `${process.env.POSTGRES_PASSWORD}`,
   database: process.env.POSTGRES_DATABASE,
-  entities: [User, Word, WordDetail, WordType, WordExample, UserUpload],
+  entities: [User, Word, WordDetail, WordType, WordExample, UserUpload, FriendRequest],
   logging: false,
   synchronize: true,
   name: "default",
@@ -40,7 +41,7 @@ export default createConnection({
   username: process.env.POSTGRES_USERNAME,
   password: `${process.env.POSTGRES_PASSWORD}`,
   database: process.env.POSTGRES_DATABASE,
-  entities: [User, Word, WordDetail, WordType, WordExample, UserUpload],
+  entities: [User, Word, WordDetail, WordType, WordExample, UserUpload, FriendRequest],
   logging: false,
   synchronize: true,
   name: "default",

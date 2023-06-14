@@ -2,14 +2,6 @@ import { type Request, type Response, type NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { type IPayload } from "@src/common/base/interface/payload";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: IPayload;
-    }
-  }
-}
-
 export async function requiredTokenMiddleware(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization?.split(" ")[1]
     ? req.headers.authorization?.split(" ")[1]

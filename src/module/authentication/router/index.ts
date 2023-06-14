@@ -4,6 +4,7 @@ import {
   loginController,
   registerController,
   getCurrentUser,
+  getAllUser,
 } from "@src/module/authentication/controlller/authentication.controller";
 import { requiredTokenMiddleware } from "../middlewere/validate";
 
@@ -13,5 +14,7 @@ app.use("/currentUser", requiredTokenMiddleware);
 app.post("/login/", loginController);
 app.post("/register/", registerController);
 app.get("/currentUser", getCurrentUser);
+app.get("/allUser", getAllUser);
+app.use(errorHandler);
 
 export default app;
