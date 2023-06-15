@@ -2,7 +2,7 @@ import { type Request, type Response, type NextFunction } from "express";
 import AWS from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
 import * as dotenv from "dotenv";
-import { IPayload } from "@src/common/base/interface";
+import { IPayload, SuccessResponse } from "@src/common/base/interface";
 import { dataSource } from "@src/database/connection";
 import { UserUpload } from "../entity/UserUpload.entity";
 import { User } from "@src/module/authentication/entity/User.entity";
@@ -38,7 +38,7 @@ async function getSignedUrlUploadFileController(req: Request, res: Response, nex
       if (err) {
         next(err);
       }
-      return res.status(200).json({ url, key });
+      return res.status(200).json(new SuccessResponse(200, "find success", undefined, { url, key }));
     });
   } else {
     next(new Error("Cannot find user"));
@@ -61,7 +61,7 @@ async function uploadFileSuccess(req: Request, res: Response, next: NextFunction
       userUpload.user_id = checkUser;
 
       const result = await repository.save(userUpload);
-      return res.status(200).json({ data: result });
+      return res.status(200).json(new SuccessResponse(200, "find success", undefined, result));
     }
   } else {
     next(new Error("Cannot find user"));

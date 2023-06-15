@@ -6,8 +6,9 @@ import { FriendRequest } from "@src/module/userManager/entity/FriendRequest.enti
 
 export interface IUser {
   id?: number;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
+  avatar?: string;
   age: number;
   email: string;
   password: string;
@@ -24,6 +25,9 @@ export class User extends PrimaryEntity {
 
   @Column({ nullable: true })
   lastName: string;
+
+  @Column({ nullable: true })
+  avatar: string;
 
   @Column({ nullable: true })
   age: number;
@@ -66,7 +70,6 @@ export class User extends PrimaryEntity {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
     cascade: true,
-    eager: true,
   })
   send_friend_request_ids: Promise<FriendRequest[]>;
 
@@ -74,15 +77,15 @@ export class User extends PrimaryEntity {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
     cascade: true,
-    eager: true,
   })
   receive_friend_request_ids: Promise<FriendRequest[]>;
 
   setData(data?: IUser) {
     if (data != null) {
       data.id ? (this.id = data.id) : 0;
-      this.firstName = data.firstName;
-      this.lastName = data.lastName;
+      data.firstName ? (this.firstName = data.firstName) : 0;
+      data.lastName ? (this.lastName = data.lastName) : 0;
+      data.avatar ? (this.avatar = data.avatar) : 0;
       this.age = data.age;
       this.email = data.email;
       this.password = data.password;
